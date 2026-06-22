@@ -1,0 +1,4 @@
+Server is running on port 3001
+[2026-06-18T14:13:12.046Z] GET /api/usuarios
+[2026-06-18T14:13:28.388Z] GET /api/usuarios
+[2026-06-18T14:13:37.466Z] GET /api/usuarios

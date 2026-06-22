@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  nome           String
+  morada         String?
+  email          String      @unique
+  datanascimento DateTime
+  dataRegisto    DateTime    @default(now())
+  funcaoId       String?     @db.ObjectId
+  passwordHash   String
+  status         String
+  estado         Int         @default(1)
+  funcao         Funcao?     @relation(fields: [funcaoId], references: [id])
+  paciente       Paciente?
+  medico         Medico?
+  recuperacaoSenha RecuperacaoSenha?
+}
+
+model UsuarioCadastroConfirmacao {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  codigo    String
+  dados     Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RecuperacaoSenha {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  usuarioId String   @db.ObjectId @unique
+  token     String   @unique
+  codigo    String?
+  expiresAt DateTime
+  used      Boolean  @default(false)
+
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model Funcao {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  nome      String
+  descricao String
+
+  usuarios  Usuario[]
+}
+
+model Paciente {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  descricao    String
+  estado       String
+  dataRegisto  DateTime   @default(now())
+  usuarioId    String     @db.ObjectId @unique
+
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id])
+  marcacoes    Marcacao[]
+}
+
+model Especialidade {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  nome        String
+  descricao   String
+  dataRegisto DateTime  @default(now())
+  estado      String
+
+  medicos     Medico[]
+}
+
+model Medico {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  nome            String
+  numeroordem     String?
+  especialidadeId String        @db.ObjectId
+  estado          String
+  usuarioId       String        @db.ObjectId @unique
+
+  usuario         Usuario       @relation(fields: [usuarioId], references: [id])
+  especialidade   Especialidade @relation(fields: [especialidadeId], references: [id])
+  agendaMedica    AgendaMedica[]
+  marcacoes       Marcacao[]
+}
+
+model AgendaMedica {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  medicoId   String   @db.ObjectId
+  data       DateTime
+  horaInicio String
+  horaFim    String
+  estado     String
+
+  medico     Medico   @relation(fields: [medicoId], references: [id])
+  marcacoes  Marcacao[]
+}
+
+model Marcacao {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  pacienteId        String      @db.ObjectId
+  medicoId          String      @db.ObjectId
+  agendaMedicaId    String      @db.ObjectId
+  dataConsultas     DateTime
+  observacao        String
+  codigoConfirmacao String
+  dataRegisto       DateTime    @default(now())
+  estado            String
+
+  paciente          Paciente    @relation(fields: [pacienteId], references: [id])
+  medico            Medico      @relation(fields: [medicoId], references: [id])
+  agendaMedica      AgendaMedica @relation(fields: [agendaMedicaId], references: [id])
+}

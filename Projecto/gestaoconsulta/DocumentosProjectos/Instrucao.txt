@@ -1,0 +1,22 @@
+Passos para criação do projecto
+
+1. Criamos pasta do projecto
+2. Instalamos node.js
+3. Instalamos NPM 
+4. Criamos um ficheiro com nome server.js que era uno servidor e rota da API
+5. estamos criar os apontador dos metodos (Put, Get, Delete, Edit)
+6. Instalamos pacote do modules usando npm init -y
+7. Criar a base de dados MongoDB
+- Cadastrar usuario e base de dados
+Nome BD: Famor
+user:db_adilsonp405
+pwd: Adilson123
+
+string de conexao: mongodb+srv://db_adilsonp405:Adilson123@famor.h7qpuhh.mongodb.net/Famor?appName=Famor
+npm install mongodb
+
+8. Tivemos que instalar prisma, para que dados conectado com bd, com metodo genered
+9. Criamos os metodos que da base de dados
+
+10. Instalamos Android studio para ser nosso emulador do Expo- react.native
+11. Criamos o projecto no vcode e emulamos para chamar aplicação no telefone

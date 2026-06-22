@@ -1,0 +1,1 @@
+import { createApp } from './API/rotas.js'; const app = createApp({}); const stack = app._router.stack.map(layer => ({ name: layer.name, path: layer.path || null, route: layer.route ? layer.route.path : null, methods: layer.route ? Object.keys(layer.route.methods).join(',') : null })); console.log(JSON.stringify(stack, null, 2));
