@@ -3,6 +3,7 @@ import { parseMarcacaoRequest } from '../helpers/marcacaoHelpers.js';
 import { obterAcessoUsuario } from '../helpers/perfilUsuario.js';
 
 const ESTADOS_MARCACAO = {
+  aberto: { estado: 'Aberto', cor: '#2563EB' },
   agendado: { estado: 'Agendado', cor: '#2563EB' },
   consultado: { estado: 'Consultado', cor: '#16A34A' },
   cancelado: { estado: 'Cancelado', cor: '#DC2626' },
@@ -19,22 +20,16 @@ function obterEstadoMarcacao(estado) {
   return ESTADOS_MARCACAO[key] ?? null;
 }
 
+function validarEstadoConsultaParaAtualizar(estado) {
+  return obterEstadoMarcacao(estado);
+}
+
 function normalizarEstado(estado) {
   return String(estado || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .trim()
     .toLowerCase();
-}
-
-function obterIntervaloHoje() {
-  const inicio = new Date();
-  inicio.setHours(0, 0, 0, 0);
-
-  const fim = new Date(inicio);
-  fim.setDate(fim.getDate() + 1);
-
-  return { inicio, fim };
 }
 
 export class MarcacaoService {
@@ -104,6 +99,75 @@ export class MarcacaoService {
     return this.repository.listar();
   }
 
+  async listarConsultasMarcadas() {
+    const marcacoes = await this.repository.listarConsultasMarcadas();
+    const pacienteIds = [...new Set(marcacoes.map((marcacao) => marcacao.pacienteId).filter(Boolean))];
+    const medicoIds = [...new Set(marcacoes.map((marcacao) => marcacao.medicoId).filter(Boolean))];
+    const agendaIds = [...new Set(marcacoes.map((marcacao) => marcacao.agendaMedicaId).filter(Boolean))];
+
+    const [pacientes, medicos, agendas] = await Promise.all([
+      pacienteIds.length ? this.repository.listarPacientesPorIds(pacienteIds) : [],
+      medicoIds.length ? this.repository.listarMedicosPorIds(medicoIds) : [],
+      agendaIds.length ? this.repository.listarAgendasPorIds(agendaIds) : [],
+    ]);
+
+    const usuarioIds = [...new Set(pacientes.map((paciente) => paciente.usuarioId).filter(Boolean))];
+    const especialidadeIds = [...new Set(medicos.map((medico) => medico.especialidadeId).filter(Boolean))];
+
+    const [usuarios, especialidades] = await Promise.all([
+      usuarioIds.length ? this.repository.listarUsuariosPorIds(usuarioIds) : [],
+      especialidadeIds.length ? this.repository.listarEspecialidadesPorIds(especialidadeIds) : [],
+    ]);
+
+    const pacientesPorId = new Map(pacientes.map((paciente) => [paciente.id, paciente]));
+    const usuariosPorId = new Map(usuarios.map((usuario) => [usuario.id, usuario]));
+    const medicosPorId = new Map(medicos.map((medico) => [medico.id, medico]));
+    const especialidadesPorId = new Map(especialidades.map((especialidade) => [especialidade.id, especialidade]));
+    const agendasPorId = new Map(agendas.map((agenda) => [agenda.id, agenda]));
+
+    return marcacoes.flatMap((marcacao) => {
+      const paciente = pacientesPorId.get(marcacao.pacienteId);
+      const usuario = paciente ? usuariosPorId.get(paciente.usuarioId) : null;
+      if (obterAcessoUsuario(usuario).role !== 'paciente') {
+        return [];
+      }
+
+      const medico = medicosPorId.get(marcacao.medicoId);
+      const especialidadeInfo = medico ? especialidadesPorId.get(medico.especialidadeId) : null;
+      const agenda = agendasPorId.get(marcacao.agendaMedicaId);
+      const medicoNome = medico?.nome ?? null;
+      const especialidade = especialidadeInfo?.nome ?? null;
+      const data = marcacao.dataConsultas ?? agenda?.data ?? null;
+      const hora = agenda?.horaInicio ?? null;
+      const pacienteNome = usuario?.nome ?? null;
+      const estadoInfo = obterEstadoMarcacao(marcacao.estado);
+
+      return [{
+        id: marcacao.id,
+        pacienteId: marcacao.pacienteId ?? null,
+        paciente: pacienteNome,
+        pacienteNome,
+        usuarioId: paciente?.usuarioId ?? null,
+        medicoId: marcacao.medicoId ?? null,
+        medico: medicoNome,
+        medicoNome,
+        nomeMedico: medicoNome,
+        especialidadeId: medico?.especialidadeId ?? null,
+        especialidade,
+        data,
+        dataConsultas: marcacao.dataConsultas,
+        hora,
+        horaInicio: agenda?.horaInicio ?? null,
+        horaFim: agenda?.horaFim ?? null,
+        agendaMedicaId: marcacao.agendaMedicaId ?? null,
+        codigoConfirmacao: marcacao.codigoConfirmacao,
+        observacao: marcacao.observacao,
+        estado: estadoInfo?.estado ?? marcacao.estado,
+        estadoCor: estadoInfo?.cor ?? null,
+      }];
+    });
+  }
+
   async listarMarcacoesFeitas(usuarioId) {
     if (!usuarioId) {
       return { error: 'Usuario autenticado nao encontrado.', status: 401 };
@@ -158,8 +222,7 @@ export class MarcacaoService {
       return null;
     }
 
-    const { inicio, fim } = obterIntervaloHoje();
-    const marcacao = await this.repository.obterUltimaMarcacaoPorPaciente(paciente.id, inicio, fim);
+    const marcacao = await this.repository.obterUltimaMarcacaoPorPaciente(paciente.id);
     if (!marcacao) {
       return null;
     }
@@ -237,7 +300,7 @@ export class MarcacaoService {
   }
 
   async atualizarEstado(id, body) {
-    const parsedEstado = obterEstadoMarcacao(body?.estado);
+    const parsedEstado = validarEstadoConsultaParaAtualizar(body?.estado);
     if (!parsedEstado) {
       return {
         error: 'Estado invalido. Use Agendado, Consultado, Cancelado ou Pendente.',

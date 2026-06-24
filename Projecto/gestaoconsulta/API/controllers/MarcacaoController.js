@@ -3,6 +3,19 @@ import { MarcacaoService } from '../services/marcacaoService.js';
 
 const { Prisma } = pkg;
 
+function getRequestUsuarioId(req) {
+  return (
+    req.user?.id ||
+    req.query?.usuarioId ||
+    req.query?.idUsuario ||
+    req.body?.usuarioId ||
+    req.body?.idUsuario ||
+    req.params?.id ||
+    req.params?.usuarioId ||
+    ''
+  );
+}
+
 export class MarcacaoController {
   constructor(prisma) {
     this.marcacaoService = new MarcacaoService(prisma);
@@ -33,7 +46,7 @@ export class MarcacaoController {
 
   async listarFeitas(req, res) {
     try {
-      const marcacoes = await this.marcacaoService.listarMarcacoesFeitas(req.user?.id);
+      const marcacoes = await this.marcacaoService.listarMarcacoesFeitas(getRequestUsuarioId(req));
       if (marcacoes?.error) {
         return res.status(marcacoes.status).json({ error: marcacoes.error });
       }
@@ -44,9 +57,21 @@ export class MarcacaoController {
     }
   }
 
+  async listarConsultasMarcadas(req, res) {
+    try {
+      const consultas = await this.marcacaoService.listarConsultasMarcadas();
+      return res.json({
+        consultas,
+      });
+    } catch (error) {
+      console.error('Erro ao listar consultas marcadas:', error);
+      return res.status(500).json({ error: 'Erro ao listar consultas marcadas.' });
+    }
+  }
+
   async obterUltima(req, res) {
     try {
-      const marcacao = await this.marcacaoService.obterUltimaMarcacao(req.user?.id);
+      const marcacao = await this.marcacaoService.obterUltimaMarcacao(getRequestUsuarioId(req));
       if (marcacao?.error) {
         return res.status(marcacao.status).json({ error: marcacao.error });
       }
@@ -59,7 +84,7 @@ export class MarcacaoController {
 
   async obterTotaisConsultas(req, res) {
     try {
-      const totais = await this.marcacaoService.obterTotaisConsultas(req.user?.id);
+      const totais = await this.marcacaoService.obterTotaisConsultas(getRequestUsuarioId(req));
       if (totais?.error) {
         return res.status(totais.status).json({ error: totais.error });
       }
@@ -141,3 +166,6 @@ export class MarcacaoController {
     }
   }
 }
+
+
+

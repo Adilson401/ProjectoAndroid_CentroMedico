@@ -94,23 +94,73 @@ export class MarcacaoRepository {
     });
   }
 
-  async obterUltimaMarcacaoPorPaciente(pacienteId, dataInicio = null, dataFim = null) {
+  async listarConsultasMarcadas() {
+    return this.prisma.marcacao.findMany({
+      select: {
+        id: true,
+        pacienteId: true,
+        medicoId: true,
+        agendaMedicaId: true,
+        dataConsultas: true,
+        codigoConfirmacao: true,
+        observacao: true,
+        estado: true,
+      },
+      orderBy: [
+        {
+          dataConsultas: 'desc',
+        },
+        {
+          dataRegisto: 'desc',
+        },
+      ],
+    });
+  }
+
+  async listarPacientesPorIds(ids) {
+    return this.prisma.paciente.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      select: {
+        id: true,
+        usuarioId: true,
+      },
+    });
+  }
+
+  async listarUsuariosPorIds(ids) {
+    return this.prisma.usuario.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      select: {
+        id: true,
+        nome: true,
+        funcao: {
+          select: {
+            id: true,
+            nome: true,
+            descricao: true,
+          },
+        },
+      },
+    });
+  }
+
+  async obterUltimaMarcacaoPorPaciente(pacienteId) {
     const where = {
       pacienteId,
-      ...(dataInicio && dataFim
-        ? {
-            dataConsultas: {
-              gte: dataInicio,
-              lt: dataFim,
-            },
-            OR: [
-              { estado: 'Agendado' },
-              { estado: 'agendado' },
-              { estado: 'Agendada' },
-              { estado: 'agendada' },
-            ],
-          }
-        : {}),
+      NOT: [
+        { estado: 'Cancelado' },
+        { estado: 'cancelado' },
+        { estado: 'Cancelada' },
+        { estado: 'cancelada' },
+      ],
     };
 
     return this.prisma.marcacao.findFirst({
@@ -249,4 +299,3 @@ export class MarcacaoRepository {
     });
   }
 }
-

@@ -61,6 +61,20 @@ const quickActions: Array<{
   { key: 'historicos', title: 'Historico', subtitle: 'Consultas anteriores', icon: 'time-outline' },
 ];
 
+const TODAY_APPOINTMENT_PATH = '/marcacaoultima';
+
+function getSessionUserParams(activeUsuarioId: string) {
+  if (!activeUsuarioId) {
+    return undefined;
+  }
+
+  return {
+    usuarioId: activeUsuarioId,
+    idUsuario: activeUsuarioId,
+    pacienteId: activeUsuarioId,
+  };
+}
+
 function getGreetingByPeriod() {
   const hour = new Date().getHours();
 
@@ -91,6 +105,9 @@ function getAppointmentDate(item: any) {
   const agenda = item?.agendaMedica || item?.agendaMedicaId || item?.agenda || {};
 
   return firstStringValue(
+    item?.Data,
+    item?.DataConsulta,
+    item?.DataConsultas,
     item?.data,
     item?.dataConsulta,
     item?.data_consulta,
@@ -106,9 +123,13 @@ function getAppointmentTime(item: any) {
   const agenda = item?.agendaMedica || item?.agendaMedicaId || item?.agenda || {};
 
   return firstStringValue(
+    item?.Horario,
+    item?.Hora,
+    item?.HoraConsulta,
     item?.horario,
     item?.hora,
     item?.horaConsulta,
+    item?.hora_consulta,
     item?.time,
     agenda?.horaInicio,
     agenda?.hora_inicio,
@@ -167,8 +188,10 @@ function getLatestAppointmentPayload(data: any): any {
   return (
     data?.ultimaMarcacao ||
     data?.marcacaoUltima ||
+    data?.MarcacaoUltima ||
     data?.ultimaConsulta ||
     data?.consultaUltima ||
+    data?.ConsultaUltima ||
     data?.latestAppointment ||
     data?.lastAppointment ||
     data?.marcacao ||
@@ -236,8 +259,8 @@ export default function HomeClient({ email, usuarioId, usuarioSessao, onLogout }
     setLoadingLatestAppointment(true);
 
     try {
-      const response = await api.get('/marcacaoultima', {
-        params: activeUsuarioId ? { usuarioId: activeUsuarioId } : undefined,
+      const response = await api.get(TODAY_APPOINTMENT_PATH, {
+        params: getSessionUserParams(activeUsuarioId),
       });
 
       let specialtyById: SpecialtyLookup = {};
@@ -295,7 +318,7 @@ export default function HomeClient({ email, usuarioId, usuarioSessao, onLogout }
       case 'agendar':
         return (
           <MarcacaoConsulta
-            usuarioId={usuarioId}
+            usuarioId={activeUsuarioId}
             usuarioSessao={usuarioSessao}
             marcacaoId={editingMarcacaoId}
             onBack={() => setTab('home')}
@@ -305,7 +328,7 @@ export default function HomeClient({ email, usuarioId, usuarioSessao, onLogout }
       case 'consultas':
         return (
           <MinhasConsultas
-            usuarioId={usuarioId}
+            usuarioId={activeUsuarioId}
             usuarioSessao={usuarioSessao}
             onEditConsulta={openEditMarcacao}
             onMenuPress={() => setDrawerVisible(true)}

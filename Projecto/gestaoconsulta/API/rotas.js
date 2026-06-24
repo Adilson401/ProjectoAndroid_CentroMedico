@@ -169,10 +169,16 @@ export function createApp(prisma) {
     (req, res) => marcacaoController.obterTotaisConsultas(req, res)
   );
   protectedRouter.get('/marcacaoultima', (req, res) => marcacaoController.obterUltima(req, res));
+  protectedRouter.get('/marcacaoultima/:id', (req, res) => marcacaoController.obterUltima(req, res));
   registerGetAliases(
     protectedRouter,
     ['/marcacaofeitas', '/marcacoesfeitas'],
     (req, res) => marcacaoController.listarFeitas(req, res)
+  );
+  registerGetAliases(
+    protectedRouter,
+    ['/consultasmarcadas', '/consultas-marcadas', '/marcacoesmarcadas', '/marcacoes-marcadas'],
+    (req, res) => marcacaoController.listarConsultasMarcadas(req, res)
   );
   protectedRouter.put('/marcacaofeitasestado/:id', (req, res) => marcacaoController.atualizarEstado(req, res));
   protectedRouter.patch('/marcacaofeitasestado/:id', (req, res) => marcacaoController.atualizarEstado(req, res));
@@ -192,3 +198,4 @@ export function createApp(prisma) {
 
   return app;
 }
+

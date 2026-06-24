@@ -8,16 +8,18 @@ export class PainelAdmRepository {
     return this.prisma.medico.count();
   }
 
-  // Conta todos os usuarios cadastrados.
+  // Conta os usuarios activos, igual a listagem de usuarios.
   async contarUsuarios() {
-    return this.prisma.usuario.count();
+    return this.prisma.usuario.count({
+      where: { estado: 1 },
+    });
   }
 
-  // Conta as consultas registadas dentro do periodo informado.
+  // Conta as consultas agendadas dentro do periodo informado.
   async contarConsultasNoPeriodo(dataInicio, dataFim) {
     return this.prisma.marcacao.count({
       where: {
-        dataRegisto: {
+        dataConsultas: {
           gte: dataInicio,
           lt: dataFim,
         },
@@ -25,11 +27,11 @@ export class PainelAdmRepository {
     });
   }
 
-  // Lista as marcacoes registadas hoje com medico, especialidade e hora.
+  // Lista as marcacoes agendadas hoje com medico, especialidade e hora.
   async listarMarcacoesDeHoje(dataInicio, dataFim) {
     return this.prisma.marcacao.findMany({
       where: {
-        dataRegisto: {
+        dataConsultas: {
           gte: dataInicio,
           lt: dataFim,
         },
@@ -59,7 +61,7 @@ export class PainelAdmRepository {
         },
       },
       orderBy: {
-        dataRegisto: 'desc',
+        dataConsultas: 'desc',
       },
     });
   }

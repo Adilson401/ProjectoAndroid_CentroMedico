@@ -170,7 +170,7 @@ export default function Login({ onLogin, onRegister, onRecover }: LoginProps) {
             )}
 
             <View style={styles.registerContainer}>
-              <Text style={styles.registerText}>Ainda nÃ£o tem conta?</Text>
+              <Text style={styles.registerText}>Ainda não tem conta?</Text>
               <TouchableOpacity onPress={onRegister}>
                 <Text style={styles.registerLink}>Novo registo</Text>
               </TouchableOpacity>

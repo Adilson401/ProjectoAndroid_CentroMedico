@@ -61,7 +61,7 @@ type AppointmentPayload = {
 const DEFAULT_CONFIRMATION_CODE = 'FM-9BNMJY';
 
 const specialtyVisuals = [
-  { id: 'clinica', name: 'ClÃ­nica Geral', icon: 'medical-outline', color: '#159CA3', background: '#E3F7F6' },
+  { id: 'clinica', name: 'Clínica Geral', icon: 'medical-outline', color: '#159CA3', background: '#E3F7F6' },
   { id: 'pediatria', name: 'Pediatria', icon: 'happy-outline', color: '#D6B436', background: '#FFF8D7' },
   { id: 'ginecologia', name: 'Ginecologia', icon: 'shield-outline', color: '#E15C73', background: '#FDE7EC' },
   { id: 'cardiologia', name: 'Cardiologia', icon: 'heart-outline', color: '#E34F69', background: '#FDE7EC' },
@@ -82,11 +82,11 @@ type CalendarDay = {
   isCurrentMonth: boolean;
 };
 
-const weekDays = ['seg', 'ter', 'qua', 'qui', 'sex', 'sÃ¡b', 'dom'];
+const weekDays = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
 const monthNames = [
   'janeiro',
   'fevereiro',
-  'marÃ§o',
+  'março',
   'abril',
   'maio',
   'junho',
@@ -97,7 +97,7 @@ const monthNames = [
   'novembro',
   'dezembro',
 ];
-const weekDayNames = ['domingo', 'segunda-feira', 'terÃ§a-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sÃ¡bado'];
+const weekDayNames = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sabado'];
 
 function padNumber(value: number) {
   return String(value).padStart(2, '0');
@@ -252,11 +252,11 @@ function abbreviateDay(value: unknown) {
   const normalized = normalizeText(value);
 
   if (['seg', 'segunda', 'segunda feira', 'segunda-feira', 'monday', '1'].includes(normalized)) return 'Seg';
-  if (['ter', 'terca', 'terÃ§a', 'terca feira', 'terÃ§a feira', 'terca-feira', 'terÃ§a-feira', 'tuesday', '2'].includes(normalized)) return 'Ter';
+  if (['ter', 'terca', 'terça', 'terca feira', 'terça feira', 'terca-feira', 'terça-feira', 'tuesday', '2'].includes(normalized)) return 'Ter';
   if (['qua', 'quarta', 'quarta feira', 'quarta-feira', 'wednesday', '3'].includes(normalized)) return 'Qua';
   if (['qui', 'quinta', 'quinta feira', 'quinta-feira', 'thursday', '4'].includes(normalized)) return 'Qui';
   if (['sex', 'sexta', 'sexta feira', 'sexta-feira', 'friday', '5'].includes(normalized)) return 'Sex';
-  if (['sab', 'sÃ¡bado', 'sabado', 'saturday', '6'].includes(normalized)) return 'SÃ¡b';
+  if (['sab', 'sabado', 'sabado', 'saturday', '6'].includes(normalized)) return 'Sab';
   if (['dom', 'domingo', 'sunday', '0', '7'].includes(normalized)) return 'Dom';
 
   return String(value || '').trim().slice(0, 3);
@@ -462,7 +462,7 @@ function normalizeDoctors(data: any): Doctor[] {
           medico?.bio ||
           item?.descricao ||
           item?.observacao ||
-          'MÃ©dico disponÃ­vel para esta especialidade.',
+          'Medico disponi­vel para esta especialidade.',
       );
 
       return {
@@ -768,7 +768,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
 
   async function handleConfirmAppointment() {
     if (!activeUsuarioId) {
-      Alert.alert('SessÃ£o invÃ¡lida', 'Nao foi possivel identificar o usuario em sessao.');
+      Alert.alert('Sessão invalida', 'Nao foi possivel identificar o usuario em sessao.');
       return;
     }
 
@@ -876,7 +876,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
   function renderSpecialties() {
     return (
       <>
-        {renderStepHeader('Escolha a Especialidade', 'Selecione a Ã¡rea mÃ©dica desejada')}
+        {renderStepHeader('Escolha a Especialidade', 'Selecione a especialidade desejada')}
 
         {loadingSpecialties ? (
           <View style={styles.feedbackCard}>
@@ -937,7 +937,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
   function renderDoctors() {
     return (
       <>
-        {renderStepHeader('Escolha o MÃ©dico', 'Selecione o profissional')}
+        {renderStepHeader('Escolha o Medico', 'Selecione o profissional')}
 
         {loadingDoctors ? (
           <View style={styles.feedbackCard}>
@@ -964,8 +964,8 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
         {!loadingDoctors && !doctorsError && doctors.length === 0 ? (
           <View style={styles.feedbackCard}>
             <Icon name="person-outline" size={24} color="#159CA3" />
-            <Text style={styles.feedbackTitle}>Sem mÃ©dicos</Text>
-            <Text style={styles.feedbackText}>NÃ£o existem mÃ©dicos disponiveis para esta especialidade.</Text>
+            <Text style={styles.feedbackTitle}>Sem medicos</Text>
+            <Text style={styles.feedbackText}>Não existem medicos disponiveis para esta especialidade.</Text>
           </View>
         ) : null}
 
@@ -1024,7 +1024,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
   function renderDateTime() {
     return (
       <>
-        {renderStepHeader('Data e HorÃ¡rio', 'Escolha quando deseja ser atendido')}
+        {renderStepHeader('Data e Horario', 'Escolha quando deseja ser atendido')}
         <View style={styles.calendarCard}>
           <View style={styles.monthRow}>
             <TouchableOpacity style={styles.monthButton} onPress={() => changeMonth(-1)}>
@@ -1071,7 +1071,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
         <View style={styles.hoursTitleRow}>
           <Icon name="time-outline" size={18} color="#159CA3" />
           <Text style={styles.hoursTitle}>
-            HorÃ¡rios em {selectedDate.getDate()} de {monthNames[selectedDate.getMonth()]}
+            Horarios em {selectedDate.getDate()} de {monthNames[selectedDate.getMonth()]}
           </Text>
         </View>
         <View style={styles.hoursGrid}>
@@ -1110,8 +1110,8 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
             <Icon name="person-outline" size={23} color="#159CA3" />
           </View>
           <View>
-            <Text style={styles.summaryLabel}>MÃ©dico</Text>
-            <Text style={styles.summaryValue}>{selectedDoctor?.name || 'MÃ©dico selecionado'}</Text>
+            <Text style={styles.summaryLabel}>Medico</Text>
+            <Text style={styles.summaryValue}>{selectedDoctor?.name || 'Medico selecionado'}</Text>
           </View>
         </View>
         <View style={styles.summaryItem}>
@@ -1120,7 +1120,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
           </View>
           <View>
             <Text style={styles.summaryLabel}>Especialidade</Text>
-            <Text style={styles.summaryValue}>{selectedSpecialty?.name || 'ClÃ­nica Geral'}</Text>
+            <Text style={styles.summaryValue}>{selectedSpecialty?.name || 'Cli­nica Geral'}</Text>
           </View>
         </View>
         <View style={styles.summaryItem}>
@@ -1137,7 +1137,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
             <Icon name="time-outline" size={23} color="#2E77A8" />
           </View>
           <View>
-            <Text style={styles.summaryLabel}>HorÃ¡rio</Text>
+            <Text style={styles.summaryLabel}>Horario</Text>
             <Text style={styles.summaryValue}>{selectedHour}</Text>
           </View>
         </View>
@@ -1148,11 +1148,11 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
   function renderConfirm() {
     return (
       <>
-        {renderStepHeader(isEditing ? 'Confirmar AtualizaÃ§Ã£o' : 'Confirmar Agendamento', 'Revise os dados antes de confirmar')}
+        {renderStepHeader(isEditing ? 'Confirmar Atualização' : 'Confirmar Agendamento', 'Revise os dados antes de confirmar')}
         {renderSummaryCard()}
         <View style={styles.observationHeader}>
           <Icon name="document-text-outline" size={17} color="#6B7280" />
-          <Text style={styles.observationTitle}>ObservaÃ§Ãµes (opcional)</Text>
+          <Text style={styles.observationTitle}>Observações (opcional)</Text>
         </View>
         <TextInput
           style={styles.textArea}
@@ -1160,7 +1160,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
           onChangeText={setObservations}
           multiline
           textAlignVertical="top"
-          placeholder="Descreva sintomas ou informaÃ§Ãµes relevantes..."
+          placeholder="Descreva sintomas ou informações relevantes..."
           placeholderTextColor="#8B95A1"
         />
         {!!confirmationError ? (
@@ -1195,14 +1195,14 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
         <View style={styles.successCard}>
           <View style={styles.successRow}>
             <View>
-              <Text style={styles.summaryLabel}>MÃ©dico</Text>
-              <Text style={styles.summaryValue}>{selectedDoctor?.name || 'MÃ©dico selecionado'}</Text>
+              <Text style={styles.summaryLabel}>Medico</Text>
+              <Text style={styles.summaryValue}>{selectedDoctor?.name || 'Medico selecionado'}</Text>
             </View>
           </View>
           <View style={styles.successRow}>
             <View>
               <Text style={styles.summaryLabel}>Especialidade</Text>
-              <Text style={styles.summaryValue}>{selectedSpecialty?.name || 'ClÃ­nica Geral'}</Text>
+              <Text style={styles.summaryValue}>{selectedSpecialty?.name || 'Clinica Geral'}</Text>
             </View>
           </View>
           <View style={styles.successDateRow}>
@@ -1214,7 +1214,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
               </View>
             </View>
             <View style={styles.successDateColumn}>
-              <Text style={styles.summaryLabel}>HorÃ¡rio</Text>
+              <Text style={styles.summaryLabel}>Horario</Text>
               <View style={styles.inlineInfo}>
                 <Icon name="time-outline" size={15} color="#159CA3" />
                 <Text style={styles.summaryValue}>{confirmedHour}</Text>
@@ -1224,18 +1224,18 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
           <View style={styles.divider} />
           <View style={styles.codeHeader}>
             <Icon name="qr-code-outline" size={16} color="#6B7280" />
-            <Text style={styles.summaryLabel}>CÃ³digo de ConfirmaÃ§Ã£o</Text>
+            <Text style={styles.summaryLabel}>Código de Confirmação</Text>
           </View>
           <View style={styles.codeBox}>
             <Text style={styles.confirmationCode}>{confirmationCode}</Text>
-            <Text style={styles.codeHint}>Apresente este cÃ³digo na recepÃ§Ã£o</Text>
+            <Text style={styles.codeHint}>Apresente este código na recepção</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.primaryButton} onPress={onOpenConsultas || onBack} activeOpacity={0.86}>
           <Text style={styles.primaryButtonText}>Ver Consultas</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.secondaryButton} onPress={onBack} activeOpacity={0.78}>
-          <Text style={styles.secondaryButtonText}>Voltar ao InÃ­cio</Text>
+          <Text style={styles.secondaryButtonText}>Voltar ao Início</Text>
         </TouchableOpacity>
       </>
     );
@@ -1246,7 +1246,7 @@ export default function MarcacaoConsulta({ usuarioId, usuarioSessao, marcacaoId,
       return (
         <View style={styles.feedbackCard}>
           <ActivityIndicator color="#159CA3" />
-          <Text style={styles.feedbackText}>A carregar marcaÃ§Ã£o...</Text>
+          <Text style={styles.feedbackText}>A carregar marcação...</Text>
         </View>
       );
     }

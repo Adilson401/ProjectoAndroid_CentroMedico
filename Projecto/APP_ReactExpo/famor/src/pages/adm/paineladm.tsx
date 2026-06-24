@@ -5,6 +5,7 @@ import { api } from '../../service/api';
 import { getApiErrorMessage as getDefaultApiErrorMessage } from '../../service/apiResponse';
 import PerfilUsuario from '../home/perfilusuario';
 import MarcacaoConsulta from '../marcacao/indexmarcacao';
+import ConsultaMarcadas from './consultamarcadas';
 import RegistarUsuarios from './registarusuarios';
 import styles from './styleadm';
 
@@ -890,7 +891,7 @@ export default function PainelAdm({
 
           <TouchableOpacity
             style={[styles.segmentButton, segment === 'consultas' && styles.segmentButtonActive]}
-            onPress={() => setSegment('consultas')}
+            onPress={() => handleTabPress('consultas')}
           >
             <Text style={[styles.segmentText, segment === 'consultas' && styles.segmentTextActive]}>Consultas</Text>
           </TouchableOpacity>
@@ -911,7 +912,7 @@ export default function PainelAdm({
     }
 
     if (tab === 'inicio') return renderHome();
-    if (tab === 'consultas') return renderComingSoon('Consultas');
+    if (tab === 'consultas') return <ConsultaMarcadas onMenuPress={() => setDrawerVisible(true)} />;
     if (tab === 'agendar') {
       return (
         <MarcacaoConsulta
